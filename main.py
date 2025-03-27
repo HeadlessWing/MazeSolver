@@ -11,6 +11,12 @@ def main():
     point_4 = Point(10, 75)
     line_2 = Line(point_3, point_4)
     win.draw_line(line_2, "black")
+
+    cell1 = Cell(win)
+    cell2 = Cell(win)
+
+    cell1.draw(50, 50, 100, 100)
+    cell2.draw(100, 100, 150, 150)
     win.wait_for_close()
 
 
