@@ -70,5 +70,12 @@ class Cell:
             bottom_wall = Line(p3, p4)
             self._win.draw_line(bottom_wall)
         
-        
+    def draw_move(self, to_cell, undo=False):
+        p1 = Point((self._x1+self._x2)/2, (self._y1+self._y2)/2)
+        p2 = Point((to_cell._x1 + to_cell._x2)/2, (to_cell._y1 + to_cell._y2)/2)
+        line = Line(p1, p2)
+        color = "grey"
+        if undo == True:
+            color = "red"
+        self._win.draw_line(line, color )
 
