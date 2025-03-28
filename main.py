@@ -1,4 +1,4 @@
-from  window import  *
+from  Classes import  *
 
 def main():
     win = Window(800,600)
@@ -20,7 +20,9 @@ def main():
     cell2.draw(100, 100, 150, 150)
     cell3.draw(0, 50, 50, 100 )
     cell1.draw_move(cell2, True)
-    
+
+    maze = Maze(100, 100, 10, 10, 50, 50, win)
+
     win.wait_for_close()
 
     
