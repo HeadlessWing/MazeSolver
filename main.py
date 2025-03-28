@@ -1,27 +1,13 @@
 from  Classes import  *
+import sys
 
 def main():
+    sys.setrecursionlimit(10000)
     win = Window(800,600)
-    
-    point_1 = Point(50, 50)
-    point_2 = Point(25, 25)
-    line_1 = Line(point_1, point_2)
-    win.draw_line(line_1, "black")
-    point_3 = Point(75, 10)
-    point_4 = Point(10, 75)
-    line_2 = Line(point_3, point_4)
-    win.draw_line(line_2, "black")
+    maze = Maze(100, 100, 50, 100, 25, 25, win)
 
-    cell1 = Cell(win)
-    cell2 = Cell(win)
-    cell3 = Cell(win)
-
-    cell1.draw(50, 50, 100, 100)
-    cell2.draw(100, 100, 150, 150)
-    cell3.draw(0, 50, 50, 100 )
-    cell1.draw_move(cell2, True)
-
-    maze = Maze(100, 100, 10, 10, 50, 50, win)
+    maze._break_entrance_and_exit()
+    maze._break_walls_r(0,0)
 
     win.wait_for_close()
 
