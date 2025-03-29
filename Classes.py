@@ -113,6 +113,7 @@ class Maze:
         self._break_entrance_and_exit()
         self._break_walls_r(0,0)
         self._reset_cells_visited()
+        self.solve()
         
     def _create_cells(self):
         self._cells = []
@@ -141,7 +142,7 @@ class Maze:
         if self._win is None:
             return
         self._win.redraw()
-        time.sleep(.05)
+        #time.sleep(.05)
     
     def _break_entrance_and_exit(self):
         self._cells[0][0].has_top_wall = False
@@ -202,6 +203,50 @@ class Maze:
         for i in range(self._num_cols):
             for j in range(self._num_rows):
                 self._cells[i][j].visited = False
+    def solve(self):
+        return self._solve_r(0,0)
+    
+    def _solve_r(self, i, j):
+        self._animate()
+        current = self._cells[i][j]
+        current.visited = True
+        if current == self._cells[self._num_cols-1][self._num_rows-1]:
+            return True
+        if i > 0 :
+            left = self._cells[i-1][j]
+            if left.visited == False and current.has_left_wall == False:
+                current.draw_move(left)
+                if self._solve_r(i-1, j) == True:
+                    return True
+                current.draw_move(left, True)
+
+        if j > 0:
+            up = self._cells[i][j-1]
+            if up.visited == False and current.has_top_wall == False:
+                current.draw_move(up)
+                if self._solve_r(i, j-1) == True:
+                    return True
+                current.draw_move(up, True)
+
+        if i < self._num_cols - 1:
+            right = self._cells[i+1][j]
+            if right.visited == False and current.has_right_wall == False:
+                current.draw_move(right)
+                if self._solve_r(i+1, j) == True:
+                    return True
+                current.draw_move(right, True)
+                
+        if j < self._num_rows - 1:
+            down = self._cells[i][j+1]
+            if down.visited == False and current.has_bottom_wall == False:
+                current.draw_move(down)
+                if self._solve_r(i, j+1) == True:
+                    return True
+                current.draw_move(down, True)
+        return False
+        
+
+
 
 
 
