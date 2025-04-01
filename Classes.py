@@ -23,15 +23,17 @@ class Window:
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
         self.maze = None
         
-
+    def clear_canvas(self):
+        self.__canvas.delete("all")
         
     
     def maze_creation(self):
         border = 10
-        columns = 5
-        rows = 5
-        cell_size = 100
-        self.maze = Maze(border, columns, rows, cell_size, cell_size, self)
+        columns = 19
+        rows = 12
+        cell_size = 10
+        self.clear_canvas()
+        self.maze = Maze(border, rows, columns, cell_size, cell_size, self)
 
     def start_maze_solve(self):
         self.maze.solve()
@@ -152,6 +154,7 @@ class Maze:
         for i in range(self._num_cols):
             for j in range(self._num_rows):
                 self._draw_cell(i , j)
+            self._animate()
 
     def _draw_cell(self, i, j):
         if self._win is None:
@@ -161,7 +164,7 @@ class Maze:
         x2 = x1 + self._cell_size_x
         y2 = y1 + self._cell_size_y
         self._cells[i][j].draw(x1, y1, x2, y2)
-        self._animate()
+        
 
     def _animate(self):
         if self._win is None:
