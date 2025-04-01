@@ -1,4 +1,5 @@
-from tkinter import Tk, BOTH, Canvas
+from tkinter import Tk, BOTH, Canvas, Frame
+import tkinter as tk
 import time
 import random
 import sys
@@ -6,10 +7,35 @@ class Window:
     def __init__(self, width, height):
         self.__root = Tk()
         self.__root.title("Maze Solver")
+        
+        self.control_frame = Frame(self.__root)
+        self.control_frame.pack(side=tk.LEFT, fill=tk.X, pady=5)
+        
+        self.start_button = tk.Button(self.control_frame, text="Start", command=self.maze_creation)
+        self.start_button.pack(side = tk.TOP, pady=3)
+
+        self.solve_button = tk.Button(self.control_frame, text="Solve", command=self.start_maze_solve)
+        self.solve_button.pack(side = tk.TOP, pady=3)
+        
         self.__canvas = Canvas(self.__root, bg="white", height=height, width=width)
         self.__canvas.pack(fill = BOTH, expand = 1)
         self.__running = False
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
+        self.maze = None
+        
+
+        
+    
+    def maze_creation(self):
+        border = 10
+        columns = 5
+        rows = 5
+        cell_size = 100
+        self.maze = Maze(border, columns, rows, cell_size, cell_size, self)
+
+    def start_maze_solve(self):
+        self.maze.solve()
+
 
     def redraw(self):
         self.__root.update_idletasks()
@@ -98,9 +124,9 @@ class Cell:
         self._win.draw_line(line, color )
 
 class Maze:
-    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win = None, seed = None):
-        self._x1 = x1
-        self._y1 = y1
+    def __init__(self, border, num_rows, num_cols, cell_size_x, cell_size_y, win = None, seed = None):
+        self._x1 = border
+        self._y1 = border
         self._num_rows = num_rows
         self._num_cols = num_cols
         self._cell_size_x = cell_size_x
@@ -113,7 +139,6 @@ class Maze:
         self._break_entrance_and_exit()
         self._break_walls_r(0,0)
         self._reset_cells_visited()
-        self.solve()
         
     def _create_cells(self):
         self._cells = []
@@ -212,22 +237,7 @@ class Maze:
         current.visited = True
         if current == self._cells[self._num_cols-1][self._num_rows-1]:
             return True
-        if i > 0 :
-            left = self._cells[i-1][j]
-            if left.visited == False and current.has_left_wall == False:
-                current.draw_move(left)
-                if self._solve_r(i-1, j) == True:
-                    return True
-                current.draw_move(left, True)
-
-        if j > 0:
-            up = self._cells[i][j-1]
-            if up.visited == False and current.has_top_wall == False:
-                current.draw_move(up)
-                if self._solve_r(i, j-1) == True:
-                    return True
-                current.draw_move(up, True)
-
+        
         if i < self._num_cols - 1:
             right = self._cells[i+1][j]
             if right.visited == False and current.has_right_wall == False:
@@ -243,6 +253,21 @@ class Maze:
                 if self._solve_r(i, j+1) == True:
                     return True
                 current.draw_move(down, True)
+        if i > 0 :
+            left = self._cells[i-1][j]
+            if left.visited == False and current.has_left_wall == False:
+                current.draw_move(left)
+                if self._solve_r(i-1, j) == True:
+                    return True
+                current.draw_move(left, True)
+
+        if j > 0:
+            up = self._cells[i][j-1]
+            if up.visited == False and current.has_top_wall == False:
+                current.draw_move(up)
+                if self._solve_r(i, j-1) == True:
+                    return True
+                current.draw_move(up, True)
         return False
         
 
