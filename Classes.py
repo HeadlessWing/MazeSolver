@@ -1,4 +1,4 @@
-from tkinter import Tk, BOTH, Canvas, Frame
+from tkinter import Tk, BOTH, Canvas, Frame, Label, Entry
 import tkinter as tk
 import time
 import random
@@ -9,14 +9,34 @@ class Window:
         self.__root.title("Maze Solver")
         
         self.control_frame = Frame(self.__root)
-        self.control_frame.pack(side=tk.LEFT, fill=tk.X, pady=5)
+        self.control_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
         
+        self.param_frame = Frame(self.control_frame)
+        self.param_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
+
         self.start_button = tk.Button(self.control_frame, text="Start", command=self.maze_creation)
-        self.start_button.pack(side = tk.TOP, pady=3)
+        self.start_button.pack(side = tk.LEFT, pady=3)
 
         self.solve_button = tk.Button(self.control_frame, text="Solve", command=self.start_maze_solve)
-        self.solve_button.pack(side = tk.TOP, pady=3)
+        self.solve_button.pack(side = tk.LEFT, pady=3)
         
+        # Row x Column inputs
+        Label(self.param_frame, text="Rows:").grid(row=0, column=0, padx=5, pady=5)
+        self.rows_entry = Entry(self.param_frame, width=5)
+        self.rows_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.rows_entry.insert(0, "50")  # Default value
+        
+        Label(self.param_frame, text="Columns:").grid(row=0, column=2, padx=5, pady=5)
+        self.cols_entry = Entry(self.param_frame, width=5)
+        self.cols_entry.grid(row=0, column=3, padx=5, pady=5)
+        self.cols_entry.insert(0, "100")  # Default value
+        
+        # Cell size input
+        Label(self.param_frame, text="Cell Size:").grid(row=0, column=4, padx=5, pady=5)
+        self.cell_size_entry = Entry(self.param_frame, width=5)
+        self.cell_size_entry.grid(row=0, column=5, padx=5, pady=5)
+        self.cell_size_entry.insert(0, "10")  # Default value
+
         self.__canvas = Canvas(self.__root, bg="white", height=height, width=width)
         self.__canvas.pack(fill = BOTH, expand = 1)
         self.__running = False
@@ -27,10 +47,10 @@ class Window:
         
     
     def maze_creation(self):
-        border = 10
-        columns = 5
-        rows = 5
-        cell_size = 100
+        border = 1
+        columns = int(self.cols_entry.get())
+        rows = int(self.rows_entry.get())
+        cell_size = int(self.cell_size_entry.get())
         self.maze = Maze(border, columns, rows, cell_size, cell_size, self)
 
     def start_maze_solve(self):
@@ -152,7 +172,20 @@ class Maze:
         for i in range(self._num_cols):
             for j in range(self._num_rows):
                 self._draw_cell(i , j)
+    def _create_cells(self):
+        self._cells = []
+        for i in range(self._num_cols):
+            list = []
+            for j in range(self._num_rows):
+                cell = Cell(self._win)
+                list.append(cell)
+            self._cells.append(list)
 
+        for i in range(self._num_cols):
+            for j in range(self._num_rows):
+                self._draw_cell_mc(i , j)
+        self._win.redraw()
+                
     def _draw_cell(self, i, j):
         if self._win is None:
             return
@@ -162,6 +195,15 @@ class Maze:
         y2 = y1 + self._cell_size_y
         self._cells[i][j].draw(x1, y1, x2, y2)
         self._animate()
+
+    def _draw_cell_mc(self, i, j):
+        if self._win is None:
+            return
+        x1 = i*  self._cell_size_x + self._x1
+        y1 = j * self._cell_size_y + self._y1
+        x2 = x1 + self._cell_size_x
+        y2 = y1 + self._cell_size_y
+        self._cells[i][j].draw(x1, y1, x2, y2)
 
     def _animate(self):
         if self._win is None:
