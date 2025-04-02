@@ -95,8 +95,13 @@ class Window:
 
     def close(self):
         self.__running = False
+    
     def draw_line(self, line, fill_color = "black"):
         line.draw(self.__canvas, fill_color)
+
+    def draw_line_solve(self, line, fill_color = "blue"):
+        line.draw_solve(self.__canvas, fill_color)
+
 
 
 class Point:
@@ -109,8 +114,11 @@ class Line:
         self.p1 = p1
         self.p2 = p2
 
-    def draw(self, canvas, fill_color):
-        canvas.create_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, fill = fill_color, width = 2)
+    def draw(self, canvas, fill_color, size = 2):
+        canvas.create_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, fill = fill_color, width = size)
+    
+    def draw_solve(self, canvas, fill_color):
+        canvas.create_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, fill = fill_color, width = 5)
 
 class Cell:
     def __init__(self, window = None):
@@ -171,6 +179,13 @@ class Cell:
         if undo == True:
             color = "red"
         self._win.draw_line(line, color )
+    
+    def draw_move_solve(self, to_cell):
+        color = "blue"
+        p1 = Point((self._x1+self._x2)/2, (self._y1+self._y2)/2)
+        p2 = Point((to_cell._x1 + to_cell._x2)/2, (to_cell._y1 + to_cell._y2)/2)
+        line = Line(p1, p2)
+        self._win.draw_line_solve(line, color)
 
 class Maze:
     def __init__(self, border, num_rows, num_cols, cell_size_x, cell_size_y, win = None, seed = None):
@@ -239,6 +254,12 @@ class Maze:
             return
         self._win.redraw()
         #time.sleep(.05)
+
+    def _animate_solve(self):
+        if self._win is None:
+            return
+        self._win.redraw()
+        time.sleep(5/(self._num_cols*self._num_rows))
     
     def _break_entrance_and_exit(self):
         self._cells[0][0].has_top_wall = False
@@ -310,7 +331,8 @@ class Maze:
         current = self._cells[i][j]
         current.visited = True
         if current == self._cells[self._num_cols-1][self._num_rows-1]:
-            return True
+            
+            return self.show_solve()
         
         if i < self._num_cols - 1:
             right = self._cells[i+1][j]
@@ -318,7 +340,7 @@ class Maze:
                 current.draw_move(right)
                 if self._solve_r(i+1, j) == True:
                     return True
-                current.dead_end = True
+                right.dead_end = True
                 current.draw_move(right, True)
                 
         if j < self._num_rows - 1:
@@ -327,7 +349,7 @@ class Maze:
                 current.draw_move(down)
                 if self._solve_r(i, j+1) == True:
                     return True
-                current.dead_end = True
+                down.dead_end = True
                 current.draw_move(down, True)
         if i > 0 :
             left = self._cells[i-1][j]
@@ -335,7 +357,7 @@ class Maze:
                 current.draw_move(left)
                 if self._solve_r(i-1, j) == True:
                     return True
-                current.dead_end = True
+                left.dead_end = True
                 current.draw_move(left, True)
 
         if j > 0:
@@ -344,22 +366,43 @@ class Maze:
                 current.draw_move(up)
                 if self._solve_r(i, j-1) == True:
                     return True
-                current.dead_end = True
+                up.dead_end = True
                 current.draw_move(up, True)
         return False
+    
     def show_solve(self):
-        for i in range(self._num_cols):
-            for j in range(self._num_rows):
-                current = self._cells[i][j]
-                if current.visited == True and current.dead_end == False:
-                    self._draw_cell_mc(i , j)
-                    self._win.redraw()
+        current = self._cells[0][0]
+        i = 0
+        j = 0
+        while current != self._cells[-1][-1]:
+            self._animate_solve()
+            if i < self._num_cols - 1:
+                right = self._cells[i + 1][j]
+                if right.visited == True and right.dead_end == False and current.has_right_wall == False:
+                    current.dead_end = True
+                    current.draw_move_solve(right)
+                    current = right
+                    i+=1
+            if j < self._num_rows - 1:
+                down = self._cells[i][j+1]
+                if down.visited == True and down.dead_end == False and current.has_bottom_wall == False:
+                    current.dead_end = True
+                    current.draw_move_solve(down)
+                    current = down
+                    j+=1
+            if i > 0 :
+                left = self._cells[i-1][j]
+                if left.visited == True and left.dead_end == False and current.has_left_wall == False:
+                    current.dead_end = True
+                    current.draw_move_solve(left)
+                    current = left
+                    i-=1
+            if j > 0:
+                up = self._cells[i][j-1]
+                if up.visited == True and up.dead_end == False and current.has_top_wall == False:
 
-
-
-
-
-
-        
-
-        
+                    current.dead_end = True
+                    current.draw_move_solve(up)
+                    current = up
+                    j-=1
+        return True
