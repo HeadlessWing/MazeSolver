@@ -14,11 +14,11 @@ class Window:
         self.param_frame = Frame(self.control_frame)
         self.param_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
 
-        self.start_button = tk.Button(self.control_frame, text="Start", command=self.maze_creation)
-        self.start_button.pack(side = tk.LEFT, pady=3)
+        self.start_button = tk.Button(self.param_frame, text="Start", command=self.maze_creation)
+        self.start_button.grid(row=0, column=6, padx=5, pady=5)
 
-        self.solve_button = tk.Button(self.control_frame, text="Solve", command=self.start_maze_solve)
-        self.solve_button.pack(side = tk.LEFT, pady=3)
+        self.solve_button = tk.Button(self.param_frame, text="Solve", command=self.start_maze_solve)
+        self.solve_button.grid(row=0, column=7, padx=5, pady=5)
         
         # Row x Column inputs
         Label(self.param_frame, text="Rows:").grid(row=0, column=0, padx=5, pady=5)
@@ -45,7 +45,7 @@ class Window:
         text="Fill Window", 
         variable=self.fill_window_var,
     )
-        self.fill_window_check.grid(row=1, column=2, columnspan=2, padx=10, pady=5)
+        self.fill_window_check.grid(row=1, column=0, columnspan=2, padx=5, pady=1)
 
         #Animation checkbox: When checked changes funtion to only redraw once after all changes are made
         self.animation_var = tk.BooleanVar()
@@ -55,7 +55,7 @@ class Window:
             text= "Animation", 
             variable=self.animation_var
         )
-        self.animation_check.grid(row=1, column=4,columnspan=2, padx=5, pady=5)
+        self.animation_check.grid(row=1, column=2,columnspan=2, padx=5, pady=1)
 
         self.__canvas = Canvas(self.__root, bg="white", height=height, width=width)
         self.__canvas.pack(fill = BOTH, expand = 1)
@@ -73,8 +73,8 @@ class Window:
         cell_size = int(self.cell_size_entry.get())
         if self.fill_window_var.get():
             # Get canvas dimensions
-            canvas_width = self.__canvas.winfo_width()-2
-            canvas_height = self.__canvas.winfo_height()-2
+            canvas_width = self.__canvas.winfo_width()-4
+            canvas_height = self.__canvas.winfo_height()-4
             
             
             columns = canvas_width // cell_size
@@ -106,7 +106,8 @@ class Window:
         line.draw(self.__canvas, fill_color)
 
     def draw_line_solve(self, line, fill_color = "blue"):
-        line.draw_solve(self.__canvas, fill_color)
+        cell_size = int(self.cell_size_entry.get())
+        line.draw_solve(self.__canvas, fill_color, cell_size//2)
 
 
 
@@ -123,8 +124,9 @@ class Line:
     def draw(self, canvas, fill_color, size = 2):
         canvas.create_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, fill = fill_color, width = size)
     
-    def draw_solve(self, canvas, fill_color):
-        canvas.create_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, fill = fill_color, width = 5)
+    def draw_solve(self, canvas, fill_color, size):
+        
+        canvas.create_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, fill = fill_color, width = size)
 
 class Cell:
     def __init__(self, window = None):

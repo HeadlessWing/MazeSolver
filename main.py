@@ -3,7 +3,7 @@ import sys
 
 def main():
     sys.setrecursionlimit(100000)
-    win = Window(1000,800)
+    win = Window(1100,800)
     
 
     win.wait_for_close()
