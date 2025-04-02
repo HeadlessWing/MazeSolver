@@ -36,40 +36,45 @@ class Window:
         self.cell_size_entry = Entry(self.param_frame, width=5)
         self.cell_size_entry.grid(row=0, column=5, padx=5, pady=5)
         self.cell_size_entry.insert(0, "10")  # Default value
-
+        # Fill window checkbox
         self.fill_window_var = tk.BooleanVar()  # Variable to hold the checkbox state
         self.fill_window_var.set(False)  # Default to not filling
-    
+
         self.fill_window_check = tk.Checkbutton(
         self.param_frame, 
         text="Fill Window", 
         variable=self.fill_window_var,
-        command=self.toggle_size_entries  # Optional: to disable size entries when checked
     )
-        self.fill_window_check.grid(row=1, column=2, columnspan=2, padx=5, pady=5)
+        self.fill_window_check.grid(row=1, column=2, columnspan=2, padx=10, pady=5)
+
+        #Animation checkbox: When checked changes funtion to only redraw once after all changes are made
+        self.animation_var = tk.BooleanVar()
+        self.animation_var.set(True)
+        self.animation_check = tk.Checkbutton(
+            self.param_frame, 
+            text= "Animation", 
+            variable=self.animation_var
+        )
+        self.animation_check.grid(row=1, column=4,columnspan=2, padx=5, pady=5)
 
         self.__canvas = Canvas(self.__root, bg="white", height=height, width=width)
         self.__canvas.pack(fill = BOTH, expand = 1)
         self.__running = False
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
         self.maze = None
-        
-    def clear_canvas(self):
-        self.__canvas.delete("all")
-        
     
     def maze_creation(self):
         self.__canvas.delete("all")
         
         
-        border = 1
+        border = 2
         columns = int(self.cols_entry.get())
         rows = int(self.rows_entry.get())
         cell_size = int(self.cell_size_entry.get())
         if self.fill_window_var.get():
             # Get canvas dimensions
-            canvas_width = self.__canvas.winfo_width()
-            canvas_height = self.__canvas.winfo_height()
+            canvas_width = self.__canvas.winfo_width()-2
+            canvas_height = self.__canvas.winfo_height()-2
             columns = canvas_width // cell_size
             rows = canvas_height // cell_size
         
@@ -87,6 +92,7 @@ class Window:
         self.__running = True
         while self.__running == True:
             self.redraw()
+
     def close(self):
         self.__running = False
     def draw_line(self, line, fill_color = "black"):
@@ -267,7 +273,10 @@ class Maze:
                 if down.visited == False and down not in to_visit:
                     to_visit.append(down)
             if to_visit == []:
-                self._draw_cell(i,j)
+                if self._win.animation_var.get() and current != self._cells[0][0]:
+                    self._draw_cell(i,j)
+                else:
+                    self._draw_cell_mc(i,j)
                 return
             
             destination = to_visit[random.randint(0,len(to_visit)-1)]
