@@ -75,8 +75,14 @@ class Window:
             # Get canvas dimensions
             canvas_width = self.__canvas.winfo_width()-2
             canvas_height = self.__canvas.winfo_height()-2
+            
+            
             columns = canvas_width // cell_size
             rows = canvas_height // cell_size
+            self.cols_entry.delete(0, tk.END)
+            self.cols_entry.insert(0, str(columns))
+            self.rows_entry.delete(0, tk.END)
+            self.rows_entry.insert(0, str(rows))
         
         self.maze = Maze(border,  rows, columns, cell_size, cell_size, self)
 
@@ -203,6 +209,7 @@ class Maze:
         self._break_entrance_and_exit()
         self._break_walls_r(0,0)
         self._reset_cells_visited()
+        self.length = 0
         
     def _create_cells(self):
         self._cells = []
@@ -259,7 +266,7 @@ class Maze:
         if self._win is None:
             return
         self._win.redraw()
-        time.sleep(5/(self._num_cols*self._num_rows))
+        time.sleep(1/(self.length+20))
     
     def _break_entrance_and_exit(self):
         self._cells[0][0].has_top_wall = False
@@ -374,6 +381,7 @@ class Maze:
         current = self._cells[0][0]
         i = 0
         j = 0
+        self.length = 0 
         while current != self._cells[-1][-1]:
             self._animate_solve()
             if i < self._num_cols - 1:
@@ -383,6 +391,7 @@ class Maze:
                     current.draw_move_solve(right)
                     current = right
                     i+=1
+                    self.length += 1
             if j < self._num_rows - 1:
                 down = self._cells[i][j+1]
                 if down.visited == True and down.dead_end == False and current.has_bottom_wall == False:
@@ -390,6 +399,7 @@ class Maze:
                     current.draw_move_solve(down)
                     current = down
                     j+=1
+                    self.length += 1
             if i > 0 :
                 left = self._cells[i-1][j]
                 if left.visited == True and left.dead_end == False and current.has_left_wall == False:
@@ -397,12 +407,15 @@ class Maze:
                     current.draw_move_solve(left)
                     current = left
                     i-=1
+                    self.length += 1
             if j > 0:
                 up = self._cells[i][j-1]
                 if up.visited == True and up.dead_end == False and current.has_top_wall == False:
-
                     current.dead_end = True
                     current.draw_move_solve(up)
                     current = up
                     j-=1
+                    self.length += 1
+
+
         return True
