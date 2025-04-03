@@ -209,7 +209,8 @@ class Maze:
         if seed == None:
             self.seed = random.seed(seed)
         self._break_entrance_and_exit()
-        self._break_walls_r(0,0)
+        #self._break_walls_r(num_cols//2,num_rows//2)
+        self._break_walls_r(num_cols-1,num_rows-1)
         self._reset_cells_visited()
         self.length = 0
         
