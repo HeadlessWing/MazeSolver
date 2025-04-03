@@ -3,6 +3,7 @@ import tkinter as tk
 import time
 import random
 import sys
+from constants import color_selector
 class Window:
     def __init__(self, width, height):
         self.__root = Tk()
@@ -141,6 +142,8 @@ class Cell:
         self._win = window
         self.visited = False
         self.dead_end = False
+        self.num_walls = 4
+
     
     def draw(self, x1, y1, x2, y2):
         self._x1 = x1
@@ -183,9 +186,34 @@ class Cell:
         p1 = Point((self._x1+self._x2)/2, (self._y1+self._y2)/2)
         p2 = Point((to_cell._x1 + to_cell._x2)/2, (to_cell._y1 + to_cell._y2)/2)
         line = Line(p1, p2)
+        global color_selector
         color = "grey"
-        if undo == True:
-            color = "red"
+        if undo == True:     
+            if color_selector == 0:
+                color = "red"
+
+            elif color_selector == 1:   
+                color = "pink"
+
+            elif color_selector == 2:  
+                color = "orange"
+
+            elif color_selector == 3:  
+                color = "yellow"
+
+            elif color_selector == 4:  
+                color = "green"
+
+            elif color_selector == 5:  
+                color = "purple"
+
+            elif color_selector == 6:  
+                color = "indigo"
+
+            elif color_selector == 7:  
+                color = "violet"
+            
+
         self._win.draw_line(line, color )
     
     def draw_move_solve(self, to_cell):
@@ -273,8 +301,10 @@ class Maze:
     
     def _break_entrance_and_exit(self):
         self._cells[0][0].has_top_wall = False
+        self._cells[0][0].num_walls -= 1
         self._draw_cell(0,0)
         self._cells[self._num_cols-1][self._num_rows-1].has_bottom_wall = False
+        self._cells[self._num_cols-1][self._num_rows-1].num_walls -= 1
         self._draw_cell(self._num_cols-1, self._num_rows-1)
 
     def _break_walls_r(self, i, j):
@@ -314,18 +344,26 @@ class Maze:
             
             if destination == left:
                 current.has_left_wall = False
+                current.num_walls -= 1
+                #left.num_walls -= 1
                 left.has_right_wall = False
                 self._break_walls_r(i-1, j )
             if destination == right:
                 current.has_right_wall = False
+                current.num_walls -= 1
+                #right.num_walls -= 1
                 right.has_left_wall = False
                 self._break_walls_r( i+1, j)
             if destination == up:
                 current.has_top_wall = False
+                current.num_walls -= 1
+                #up.num_walls -= 1
                 up.has_bottom_wall = False
                 self._break_walls_r( i, j-1)
             if destination == down:
                 current.has_bottom_wall = False
+                current.num_walls -= 1
+                #down.num_walls -= 1
                 down.has_top_wall = False
                 self._break_walls_r(i, j+1)
 
@@ -340,6 +378,7 @@ class Maze:
         self._animate()
         current = self._cells[i][j]
         current.visited = True
+        global color_selector
         if current == self._cells[self._num_cols-1][self._num_rows-1]:
             
             return self.show_solve()
@@ -350,7 +389,11 @@ class Maze:
                 current.draw_move(right)
                 if self._solve_r(i+1, j) == True:
                     return True
+                if current.num_walls == 3:
+                    color_selector += 1 % 8
                 right.dead_end = True
+                #print(current.num_walls)
+                
                 current.draw_move(right, True)
                 
         if j < self._num_rows - 1:
@@ -359,6 +402,8 @@ class Maze:
                 current.draw_move(down)
                 if self._solve_r(i, j+1) == True:
                     return True
+                if current.num_walls == 3:
+                    color_selector += 1 % 8
                 down.dead_end = True
                 current.draw_move(down, True)
         if i > 0 :
@@ -367,6 +412,8 @@ class Maze:
                 current.draw_move(left)
                 if self._solve_r(i-1, j) == True:
                     return True
+                if current.num_walls == 3:
+                    color_selector += 1 % 8
                 left.dead_end = True
                 current.draw_move(left, True)
 
@@ -376,6 +423,8 @@ class Maze:
                 current.draw_move(up)
                 if self._solve_r(i, j-1) == True:
                     return True
+                if current.num_walls == 3:
+                    color_selector += 1 % 8
                 up.dead_end = True
                 current.draw_move(up, True)
         return False

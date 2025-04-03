@@ -1,0 +1,1 @@
+color_selector = 0
