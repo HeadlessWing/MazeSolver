@@ -106,6 +106,10 @@ class Window:
     def draw_line(self, line, fill_color = "black"):
         line.draw(self.__canvas, fill_color)
 
+    def draw_line_move(self, line, fill_color = "blue"):
+        cell_size = int(self.cell_size_entry.get())
+        line.draw_solve(self.__canvas, fill_color, cell_size//3)
+
     def draw_line_solve(self, line, fill_color = "blue"):
         cell_size = int(self.cell_size_entry.get())
         line.draw_solve(self.__canvas, fill_color, cell_size//2)
@@ -202,25 +206,25 @@ class Cell:
                 color = "crimson"
 
             elif color_selector == 2:  
-                color = "orangered"
+                color = "deepskyblue"
 
             elif color_selector == 3:  
                 color = "gold"
 
             elif color_selector == 4:  
-                color = "green"
+                color = "springgreen"
 
             elif color_selector == 5:  
-                color = "purple"
+                color = "magenta"
 
             elif color_selector == 6:  
-                color = "indigo"
+                color = "mediumorchid"
 
             elif color_selector == 7:  
-                color = "blue"
+                color = "darkgreen"
             
 
-        self._win.draw_line(line, color )
+        self._win.draw_line_move(line, color )
     
     def draw_move_solve(self, to_cell):
         color = "blue"
